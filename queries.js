@@ -10,7 +10,7 @@ const pool = new Pool({
   port: 5432,
 })
 
-//GET all users
+// GET all users
 const getUsers = (request, response) =>{
     pool.query('select * from users order by id',(error,results) => {
         if(error) {
@@ -23,8 +23,6 @@ const getUsers = (request, response) =>{
 // GET a single user by id
 const getUserById = (request, response) => {
     const id = parseInt(request.params.id)
-
-
 pool.query('select * from users where id = $1', [id], (error,results) =>{
     if(error){
         throw error
@@ -33,17 +31,7 @@ pool.query('select * from users where id = $1', [id], (error,results) =>{
 })
 }
 
-// POST a new user
-// const createUser = (request, response) => {
-//     const { name, email } = request.body
-  
-//     pool.query('INSERT INTO users (name, email) VALUES ($1, $2) ', [name, email], (error, results) => {
-//       if (error) {
-//         throw error
-//       }
-//       response.status(201).send(`User added with ID: ${results.rows}`)
-//     })
-//   }
+// POST create user
 const createUser = (request, response) => {
     const { name, email } = request.body
   
@@ -86,10 +74,24 @@ response.status(200).send(`User deleted with ID ${id}`)
 })
 }
 
+//GET search users
+const getUserByName = (request,response) => {
+    const key = request.query.key
+pool.query('select * from users where name ilike $1',['%'+key+'%'],(error,results) => {
+    if(error){
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+  }
+
+
+
 module.exports = {
     getUsers,
     getUserById,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUserByName
 }
